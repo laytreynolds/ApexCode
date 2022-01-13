@@ -1,0 +1,85 @@
+// Wrap in [] and return an array
+Account[] accts = [SELECT Name,Phone FROM Account];
+
+// Add account and related contact
+Account acct = new Account(
+    Name='SFDC Computing',
+    Phone='(415)555-1212',
+    NumberOfEmployees=50,
+    BillingCity='San Francisco');
+insert acct;
+
+// Once the account is inserted, the sObject will be 
+// populated with an ID.
+// Get this ID.
+ID acctID = acct.ID;
+
+// Add a contact to this account.
+Contact con = new Contact(
+    FirstName='Carol',
+    LastName='Ruiz',
+    Phone='(415)555-1212',
+    Department='Wingo',
+    AccountId=acctID);
+insert con;
+
+// Add account with no contact
+Account acct2 = new Account(
+    Name='The SFDC Query Man',
+    Phone='(310)555-1213',
+    NumberOfEmployees=50,
+    BillingCity='Los Angeles',
+    Description='Expert in wing technologies.');
+insert acct2;
+
+// Basic SOQL Syntax
+SELECT fields FROM ObjectName [WHERE Condition]
+
+// select x from x where Condition
+SELECT Name,Phone FROM Account WHERE Name='SFDC Computing'
+
+// select x from x where Condition and condition
+
+SELECT Name,Phone FROM Account WHERE (Name='SFDC Computing' AND NumberOfEmployees>25)
+
+// select x from x ORDER BY
+SELECT Name,Phone FROM Account ORDER BY Name
+SELECT Name,Phone FROM Account ORDER BY Name ASC
+SELECT Name,Phone FROM Account ORDER BY Name DESC
+
+// Limit to 1 records
+Account oneAccountOnly = [SELECT Name,Phone FROM Account LIMIT 1];
+
+// accessing variables 
+String targetDepartment = 'Wingo';
+Contact[] techContacts = [SELECT FirstName,LastName 
+                          FROM Contact WHERE Department=:targetDepartment];
+
+// accessing related records
+Account[] acctsWithContacts = [SELECT Name, (SELECT FirstName,LastName FROM Contacts)
+                               FROM Account 
+                               WHERE Name = 'SFDC Computing'];
+
+// Get child records
+Contact[] cts = acctsWithContacts[0].Contacts;
+System.debug('Name of first associated contact: ' 
+             + cts[0].FirstName + ', ' + cts[0].LastName);
+
+
+Contact[] cts = [SELECT Account.Name FROM Contact 
+                 WHERE FirstName = 'Carol' AND LastName='Ruiz'];
+Contact carol = cts[0];
+String acctName = carol.Account.Name;
+System.debug('Carol\'s account name is ' + acctName);
+
+public class ContactSearch {
+    
+    public static List<Contact> searchForContacts(String str1, String str2){
+        
+        List<Contact> contacts = [SELECT ID, Name FROM Contact WHERE LastName = :str1 AND MailingPostalCode = :str2];
+            
+           return contacts;
+        
+    }
+
+}
