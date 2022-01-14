@@ -1,0 +1,15 @@
+// Unit Testing
+
+// Test Syntax
+@isTest static void testName() {
+    // code_block
+}
+
+          @isTest
+private class MyTestClass {
+    @isTest static void myTest() {
+        // code_block
+    }
+}     
+
+q
